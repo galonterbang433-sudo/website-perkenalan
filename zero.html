@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Form Perkenalan Diri</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #0f172a, #1e3a8a);
+        color: white;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 500px;
+        margin: auto;
+        background: white;
+        color: #222;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+        text-align: center;
+        color: #1e3a8a;
+    }
+
+    p {
+        text-align: center;
+        color: #555;
+    }
+
+    label {
+        display: block;
+        margin-top: 12px;
+        font-weight: bold;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 20px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1d4ed8;
+    }
+
+    .card {
+        background: #f1f5f9;
+        color: #222;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 15px;
+        border-left: 5px solid #2563eb;
+    }
+
+    .card h3 {
+        color: #1e3a8a;
+    }
+
+    .hapus {
+        background: #dc2626;
+        margin-top: 10px;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        color: #ddd;
+        font-size: 13px;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>👋 Perkenalan Diri</h1>
+    <p>isi bay cuman uji coba doang</p>
+
+    <form id="formIdentitas">
+
+        <label>Nama Lengkap</label>
+        <input type="text" id="nama" placeholder="Masukkan nama" required>
+
+        <label>Umur</label>
+        <input type="number" id="umur" placeholder="Masukkan umur" required>
+
+        <label>Tanggal Lahir</label>
+        <input type="date" id="tanggal" required>
+
+        <label>Asal Sekolah</label>
+        <input type="text" id="sekolah" placeholder="Nama sekolah" required>
+
+        <label>Kelas</label>
+        <input type="text" id="kelas" placeholder="Contoh: X TKJ 1">
+
+        <label>Hobi</label>
+        <input type="text" id="hobi" placeholder="Apa hobimu?" required>
+
+        <label>Cita-cita</label>
+        <input type="text" id="cita" placeholder="Apa cita-citamu?">
+
+        <label>Pesan atau Perkenalan</label>
+        <textarea id="pesan" rows="4"
+        placeholder="Ceritakan sedikit tentang dirimu..."></textarea>
+
+        <button type="submit">Kirim Perkenalan</button>
+    </form>
+</div>
+
+<div class="container" style="margin-top:25px;">
+    <h1>📋 Daftar Perkenalan</h1>
+    <div id="daftar"></div>
+
+    <button class="hapus" onclick="hapusSemua()">
+        Hapus Semua Data
+    </button>
+</div>
+
+<div class="footer">
+    Website Perkenalan Diri Sederhana
+</div>
+
+<script>
+    const form = document.getElementById("formIdentitas");
+    const daftar = document.getElementById("daftar");
+
+    let dataOrang = JSON.parse(localStorage.getItem("identitas")) || [];
+
+    function tampilkanData() {
+        daftar.innerHTML = "";
+
+        dataOrang.forEach((orang, index) => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const judul = document.createElement("h3");
+            judul.textContent = orang.nama;
+
+            card.appendChild(judul);
+
+            const isi = [
+                "Umur: " + orang.umur + " tahun",
+                "Tanggal lahir: " + orang.tanggal,
+                "Sekolah: " + orang.sekolah,
+                "Kelas: " + (orang.kelas || "-"),
+                "Hobi: " + orang.hobi,
+                "Cita-cita: " + (orang.cita || "-"),
+                "Pesan: " + (orang.pesan || "-")
+            ];
+
+            isi.forEach(teks => {
+                const baris = document.createElement("p");
+                baris.textContent = teks;
+                card.appendChild(baris);
+            });
+
+            const tombol = document.createElement("button");
+            tombol.textContent = "Hapus";
+            tombol.className = "hapus";
+            tombol.onclick = () => hapusData(index);
+
+            card.appendChild(tombol);
+            daftar.appendChild(card);
+        });
+    }
+
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const orang = {
+            nama: document.getElementById("nama").value,
+            umur: document.getElementById("umur").value,
+            tanggal: document.getElementById("tanggal").value,
+            sekolah: document.getElementById("sekolah").value,
+            kelas: document.getElementById("kelas").value,
+            hobi: document.getElementById("hobi").value,
+            cita: document.getElementById("cita").value,
+            pesan: document.getElementById("pesan").value
+        };
+
+        dataOrang.push(orang);
+
+        localStorage.setItem("identitas", JSON.stringify(dataOrang));
+
+        tampilkanData();
+        form.reset();
+
+        alert("Perkenalan berhasil ditambahkan!");
+    });
+
+    function hapusData(index) {
+        dataOrang.splice(index, 1);
+        localStorage.setItem("identitas", JSON.stringify(dataOrang));
+        tampilkanData();
+    }
+
+    function hapusSemua() {
+        if (confirm("Yakin ingin menghapus semua data?")) {
+            dataOrang = [];
+            localStorage.removeItem("identitas");
+            tampilkanData();
+        }
+    }
+
+    tampilkanData();
+</script>
+
+</body>
+</html>
